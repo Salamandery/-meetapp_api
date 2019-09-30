@@ -1,0 +1,25 @@
+{
+  "name": "meetup_api",
+  "version": "1.0.0",
+  "description": "meetup_backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Salamandery/-meetup_api.git"
+  },
+  "keywords": [
+    "backend"
+  ],
+  "author": "Rodolfo M F Abreu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Salamandery/-meetup_api/issues"
+  },
+  "homepage": "https://github.com/Salamandery/-meetup_api#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
