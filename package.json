@@ -4,7 +4,7 @@
   "description": "meetup_backend",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,11 @@
   },
   "homepage": "https://github.com/Salamandery/-meetup_api#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "sucrase": "^3.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3"
   }
 }
