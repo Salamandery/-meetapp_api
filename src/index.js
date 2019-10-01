@@ -2,7 +2,7 @@ import express from 'express';
 import env from 'dotenv';
 // modulo de rotas
 import routes from './routes';
-//Importação do banco de dados
+// Importação do banco de dados
 import './database';
 // Classe do servidor onde ocorre toda a configuração de middlewares e rotas
 class App {
