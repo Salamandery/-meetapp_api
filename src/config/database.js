@@ -1,8 +1,8 @@
 module.exports = {
     dialect: 'postgres',
-    host: 'localhost',
+    host: '10.42.112.48',
     username: 'postgres',
-    password: process.env.DBPASS,
+    password: '$up0rte?',
     database: 'meetup',
     define: {
         timestamps: true,
