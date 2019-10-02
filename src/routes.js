@@ -11,6 +11,8 @@ import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 // File
 import FileController from './app/controllers/FileController';
+// Events
+import EventsController from './app/controllers/EventsController';
 
 // Iniciando rotas
 const routes = new Router();

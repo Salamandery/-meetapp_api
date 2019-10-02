@@ -5,12 +5,14 @@ import Sequelize from 'sequelize';
 import User from '../app/models/Users';
 // Arquivos
 import Files from '../app/models/Files';
+// Eventos
+import Events from '../app/models/Events';
 
 // Configurações do db
 import conf from '../config/database';
 
 // Lista de models
-const models = [User, Files];
+const models = [User, Files, Events];
 
 class Database {
     constructor() {
@@ -24,7 +26,8 @@ class Database {
         // Passando conexão para os models
         models
             .map(model => model.init(this.connection))
-            .map(model =>
+            .map(
+                model =>
                     model.associate && model.associate(this.connection.models)
             );
     }
