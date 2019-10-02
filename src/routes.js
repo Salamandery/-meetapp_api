@@ -25,8 +25,12 @@ routes.post('/sessions', SessionController.store);
 routes.use(auth);
 // Cadastro de usuários
 routes.post('/users', UserController.store);
-// Cadastro de usuários
+// Cadastro e upload de imagem
 routes.post('/files', upload.single('file'), FileController.store);
+// Listagem de eventos
+routes.get('/events', EventsController.index);
+// Cadastro de eventos
+routes.post('/events', EventsController.store);
 // Atualização do cadastro do usuário
 routes.put('/users', UserController.update);
 
