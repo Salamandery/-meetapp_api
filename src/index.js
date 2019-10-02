@@ -1,4 +1,5 @@
 import express from 'express';
+import { resolve } from 'path';
 import env from 'dotenv';
 // modulo de rotas
 import routes from './routes';
@@ -18,6 +19,11 @@ class App {
     middlewares() {
         // Requisições do tipo json
         this.server.use(express.json());
+        // Requisições estáticas
+        this.server.use(
+            '/files',
+            express.static(resolve(__dirname, '..', 'tmp', 'uploads'))
+        );
         // Variaveis de ambiente
         env.config();
     }

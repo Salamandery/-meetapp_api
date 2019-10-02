@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import * as Yup from 'yup';
 // Configurações da Sessão
 import conf from '../../config/auth';
 // Modelo do usuário
@@ -6,6 +7,29 @@ import User from '../models/Users';
 
 class SessionController {
     async store(req, res) {
+        // Validação
+        const schema = Yup.object().shape({
+            email: Yup.string()
+                .email()
+                .required(),
+            oldPassword: Yup.string()
+                .required()
+                .min(6),
+            password: Yup.string()
+                .min(6)
+                .when('oldPassword', (oldPassword, field) =>
+                    oldPassword ? field.required() : field
+                ),
+            confirmPassword: Yup.string().when('password', (password, field) =>
+                password ? field.required().oneOf([Yup.ref('password')]) : field
+            ),
+        });
+
+        if (!(await schema.isValid(req.body))) {
+            return res
+                .status(400)
+                .json({ msg: 'Erro de validação nos campos.' });
+        }
         // Dados pelo body
         const { email, password } = req.body;
         // Verifica se usuário existe
