@@ -18,5 +18,7 @@ routes.post('/sessions', SessionController.store);
 routes.use(auth);
 // Cadastro de usuários
 routes.post('/users', UserController.store);
+// Atualização do cadastro do usuário
+routes.put('/users', UserController.update);
 
 module.exports = routes;

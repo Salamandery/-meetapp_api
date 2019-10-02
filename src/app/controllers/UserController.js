@@ -22,14 +22,33 @@ class UserController {
     }
 
     async update(req, res) {
+        // Valores passados pelo body
+        const { email, oldPassword } = req.body;
+
         // Verifica se usuário existe
-        const Exists = await User.findOne({ where: { email: req.body.email } });
+        const Exists = await User.findByPk(req.userId);
 
-        if (Exists) {
-            // await User.
+        if (email !== Exists.email) {
+            // Verificando se email existe
+            const emailExists = await User.findOne({ where: { email } });
+
+            if (emailExists) {
+                return res
+                    .status(400)
+                    .json({ msg: 'O usuário informado já existe!', Exists });
+            }
         }
+        // Verificação de mudança de senha
+        if (oldPassword && !(await Exists.checkPassword(oldPassword))) {
+            // Se senha não bater
+            return res.status(401).json({ msg: 'Senha inválida.' });
+        }
+        // Atualização do usuário
+        const user = await Exists.update(req.body);
 
-        return res.status(400).json({ msg: 'Usuário não existe.' });
+        user.password_hash = undefined;
+
+        return res.json({ msg: 'Alteração realizada com sucesso', user });
     }
 }
 
