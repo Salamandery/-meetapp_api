@@ -1,5 +1,7 @@
 import { Router } from 'express';
 
+// Middleware authentication
+import auth from './app/middlewares/auth';
 // Controllers
 // User
 import UserController from './app/controllers/UserController';
@@ -10,9 +12,11 @@ import SessionController from './app/controllers/SessionController';
 const routes = new Router();
 
 // Rotas
-// Cadastro de usuários
-routes.post('/users', UserController.store);
 // Definição de sessão
 routes.post('/sessions', SessionController.store);
+// Necessário autenticar antes de navegar abaixo
+routes.use(auth);
+// Cadastro de usuários
+routes.post('/users', UserController.store);
 
 module.exports = routes;

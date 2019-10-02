@@ -1,9 +1,9 @@
 // Configuração para conectar ao db
 module.exports = {
     dialect: 'postgres',
-    host: '10.42.112.48',
+    host: 'localhost',
     username: 'postgres',
-    password: '$up0rte?',
+    password: '1234',
     database: 'meetup',
     define: {
         timestamps: true,
