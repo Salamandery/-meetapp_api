@@ -12,7 +12,7 @@ import SessionController from './app/controllers/SessionController';
 // File
 import FileController from './app/controllers/FileController';
 // Events
-import EventsController from './app/controllers/EventsController';
+import EventsController from './app/controllers/EventController';
 
 // Iniciando rotas
 const routes = new Router();

@@ -17,7 +17,7 @@ class Events extends Model {
     }
 
     static associate(models) {
-        this.belongsTo(models.File, { foreignKey: 'banner_id', as: 'banner' });
+        this.belongsTo(models.Files, { foreignKey: 'banner_id', as: 'banner' });
         this.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
         this.belongsTo(models.User, {
             foreignKey: 'provider_id',

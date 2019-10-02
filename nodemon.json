@@ -1,5 +1,5 @@
 {
     "execMap": {
-        "js": "yarn sucrase-node"
+        "js": "npx sucrase-node"
     }
 }

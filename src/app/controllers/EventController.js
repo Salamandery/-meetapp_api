@@ -7,12 +7,12 @@ import User from '../models/Users';
 import File from '../models/Files';
 // Eventos
 import Event from '../models/Events';
-// Arquivos
-// import files from '../models/Files';
 
 class EventController {
     async index(req, res) {
+        // Paginação enviada pela url
         const { page = 1 } = req.query;
+        // Listagem com limite de paginação * 20
         const event = await Event.findAll({
             where: { user_id: req.userId, canceled_at: null },
             order: ['date'],
