@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import { startOfHour, parseISO, isBefore } from 'date-fns';
 // Modelos
 // Usuário
@@ -20,6 +21,11 @@ class EventController {
             offset: (page - 1) * 20,
             attributes: ['id', 'date'],
             include: [
+                {
+                    model: File,
+                    as: 'banner',
+                    attributes: ['name', 'path', 'url'],
+                },
                 {
                     model: User,
                     as: 'provider',
@@ -44,6 +50,7 @@ class EventController {
             date: Yup.date().required(),
             provider_id: Yup.number().required(),
             name: Yup.string().required(),
+            description: Yup.string().required(),
         });
         // Gera erro se campo não for válido
         if (!(await schema.isValid(req.body))) {
@@ -52,7 +59,7 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const { provider_id, date, name } = req.body;
+        const { provider_id, date, name, description, banner_id } = req.body;
         // Verifica se o usuário é provedor e existe
         const isProvider = await User.findOne({
             where: {
@@ -86,6 +93,73 @@ class EventController {
             provider_id,
             date,
             name,
+            description,
+            banner_id: banner_id || null,
+        });
+
+        return res.json(Events);
+    }
+
+    async update(req, res) {
+        // Validação
+        const schema = Yup.object().shape({
+            date: Yup.date().required(),
+            provider_id: Yup.number().required(),
+            name: Yup.string().required(),
+            description: Yup.string().required(),
+            banner_id: Yup.number(),
+        });
+        // Gera erro se campo não for válido
+        if (!(await schema.isValid(req.body))) {
+            return res
+                .status(400)
+                .json({ msg: 'Erro de validação nos campos.' });
+        }
+        // Relacionamento e filtros
+        const { provider_id, date, name, description, banner_id } = req.body;
+        // Verifica se o usuário é provedor e existe
+        const Exists = await User.findOne({
+            where: {
+                name,
+                date,
+                description,
+                provider_id,
+            },
+        });
+        // Erro caso não seja ou não exista
+        if (!Exists) {
+            return res.status(401).json({ msg: 'Evento não encontrado.' });
+        }
+        // Conversão de data
+        const hourStart = startOfHour(parseISO(date));
+        // Verifica se a data já passou
+        if (isBefore(hourStart, new Date())) {
+            return res.status(401).json({ msg: 'Data não permitida.' });
+        }
+        // Verifica disponibilidade
+        const checkCancelado = await Event.findOne({
+            where: { provider_id, canceled_at: { [Op.ne]: null } },
+        });
+        // Se já existir gera erro
+        if (checkCancelado) {
+            return res.status(401).json({ msg: 'Evento foi cancelado.' });
+        }
+        // Verifica disponibilidade
+        const checkConcluido = await Event.findOne({
+            where: { provider_id, successed_at: { [Op.ne]: null } },
+        });
+        // Se já existir gera erro
+        if (checkConcluido) {
+            return res.status(401).json({ msg: 'Evento já foi concluído.' });
+        }
+        // Cria evento se tudo ok
+        const Events = await Event.create({
+            user_id: req.userId,
+            provider_id,
+            date,
+            name,
+            description,
+            banner_id: banner_id || null,
         });
 
         return res.json(Events);

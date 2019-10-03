@@ -13,8 +13,10 @@ import SessionController from './app/controllers/SessionController';
 import FileController from './app/controllers/FileController';
 // Events
 import EventsController from './app/controllers/EventController';
-// Events
+// Provedores
 import ProviderController from './app/controllers/ProviderController';
+// Agendamento
+import ScheduleController from './app/controllers/ScheduleController';
 
 // Iniciando rotas
 const routes = new Router();
@@ -25,10 +27,14 @@ const upload = multer(conf);
 routes.post('/sessions', SessionController.store);
 // Necessário autenticar antes de navegar abaixo
 routes.use(auth);
+// Listagem de usuários
+routes.get('/users', UserController.index);
 // Listagem de Provedores de serviço
 routes.get('/providers', ProviderController.index);
 // Listagem de eventos
 routes.get('/events', EventsController.index);
+// Listagem de eventos
+routes.get('/schedules', ScheduleController.index);
 // Cadastro de usuários
 routes.post('/users', UserController.store);
 // Cadastro e upload de imagem
@@ -37,5 +43,7 @@ routes.post('/files', upload.single('file'), FileController.store);
 routes.post('/events', EventsController.store);
 // Atualização do cadastro do usuário
 routes.put('/users', UserController.update);
+// Atualização do cadastro de eventos
+routes.put('/events', EventsController.update);
 
 module.exports = routes;

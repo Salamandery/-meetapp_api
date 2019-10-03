@@ -4,9 +4,11 @@ class Events extends Model {
     static init(sequelize) {
         super.init(
             {
+                name: Sequelize.STRING,
+                description: Sequelize.STRING,
+                date: Sequelize.DATE,
                 successed_at: Sequelize.DATE,
                 canceled_at: Sequelize.DATE,
-                date: Sequelize.DATE,
             },
             {
                 sequelize,

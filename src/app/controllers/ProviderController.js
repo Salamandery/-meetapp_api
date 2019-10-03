@@ -9,7 +9,7 @@ class ProviderController {
         // Relacionamento e filtros
         const Providers = await User.findAll({
             where: { provider: true },
-            attributes: ['id', 'name', 'email', 'avatar_id'],
+            attributes: ['id', 'name', 'email'],
             include: [
                 {
                     model: files,

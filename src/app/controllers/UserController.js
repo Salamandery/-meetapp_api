@@ -1,8 +1,23 @@
 import * as Yup from 'yup';
 // Modelo do usuário
 import User from '../models/Users';
+// Modelo do usuário
+import File from '../models/Files';
 
 class UserController {
+    async index(req, res) {
+        const users = await User.findAll({
+            attributes: ['name', 'email', 'provider', 'created_at'],
+            include: {
+                model: File,
+                as: 'avatar',
+                attributes: ['name', 'path', 'url'],
+            },
+        });
+
+        return res.json(users);
+    }
+
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
