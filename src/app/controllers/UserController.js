@@ -46,9 +46,7 @@ class UserController {
             email: Yup.string()
                 .email()
                 .required(),
-            oldPassword: Yup.string()
-                .required()
-                .min(6),
+            oldPassword: Yup.string(),
             password: Yup.string()
                 .min(6)
                 .when('oldPassword', (oldPassword, field) =>

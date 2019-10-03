@@ -43,6 +43,7 @@ class EventController {
         const schema = Yup.object().shape({
             date: Yup.date().required(),
             provider_id: Yup.number().required(),
+            name: Yup.string().required(),
         });
         // Gera erro se campo não for válido
         if (!(await schema.isValid(req.body))) {
@@ -51,7 +52,7 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const { provider_id, date } = req.body;
+        const { provider_id, date, name } = req.body;
         // Verifica se o usuário é provedor e existe
         const isProvider = await User.findOne({
             where: {
@@ -84,6 +85,7 @@ class EventController {
             user_id: req.userId,
             provider_id,
             date,
+            name,
         });
 
         return res.json(Events);
