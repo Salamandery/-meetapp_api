@@ -6,6 +6,7 @@ class Events extends Model {
             {
                 name: Sequelize.STRING,
                 description: Sequelize.STRING,
+                location: Sequelize.STRING,
                 date: Sequelize.DATE,
                 successed_at: Sequelize.DATE,
                 canceled_at: Sequelize.DATE,

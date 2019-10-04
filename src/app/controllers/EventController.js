@@ -51,6 +51,8 @@ class EventController {
             provider_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
+            location: Yup.string().required(),
+            banner_id: Yup.number().required(),
         });
         // Gera erro se campo não for válido
         if (!(await schema.isValid(req.body))) {
@@ -59,7 +61,14 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const { provider_id, date, name, description, banner_id } = req.body;
+        const {
+            provider_id,
+            date,
+            name,
+            description,
+            location,
+            banner_id,
+        } = req.body;
         // Verifica se o usuário é provedor e existe
         const isProvider = await User.findOne({
             where: {
@@ -94,7 +103,8 @@ class EventController {
             date,
             name,
             description,
-            banner_id: banner_id || null,
+            location,
+            banner_id,
         });
 
         return res.json(Events);
@@ -107,7 +117,8 @@ class EventController {
             provider_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
-            banner_id: Yup.number(),
+            location: Yup.string().required(),
+            banner_id: Yup.number().required(),
         });
         // Gera erro se campo não for válido
         if (!(await schema.isValid(req.body))) {
@@ -116,7 +127,14 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const { provider_id, date, name, description, banner_id } = req.body;
+        const {
+            provider_id,
+            date,
+            name,
+            description,
+            location,
+            banner_id,
+        } = req.body;
         // Verifica se o usuário é provedor e existe
         const Exists = await User.findOne({
             where: {
@@ -159,7 +177,8 @@ class EventController {
             date,
             name,
             description,
-            banner_id: banner_id || null,
+            location,
+            banner_id,
         });
 
         return res.json(Events);
