@@ -16,7 +16,7 @@ class SessionController {
                 .required()
                 .min(6),
         });
-
+        // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
             return res
                 .status(400)

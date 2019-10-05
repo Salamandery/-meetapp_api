@@ -25,7 +25,9 @@ class User extends Model {
         return this;
     }
 
+    // FK
     static associate(models) {
+        // FK id do arquivo
         this.belongsTo(models.Files, { foreignKey: 'avatar_id', as: 'avatar' });
     }
 

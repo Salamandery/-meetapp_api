@@ -37,6 +37,7 @@ class Database {
         this.mongoConnection = mongo.connect(process.env.MONGOURL, {
             useNewUrlParser: true,
             useFindAndModify: true,
+            useUnifiedTopology: true,
         });
     }
 }

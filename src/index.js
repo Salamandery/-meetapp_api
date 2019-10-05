@@ -1,4 +1,5 @@
 import express from 'express';
+// Resolvendo rotas
 import { resolve } from 'path';
 import env from 'dotenv';
 // modulo de rotas

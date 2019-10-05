@@ -6,7 +6,14 @@ module.exports = {
                 {
                     id: 1,
                     name: 'TESTE',
-                    path: '18b4e440fc034a61b8d360a40a002110.jpg',
+                    path: 'f38b4e2a8b7f19244c458d5f1ac34472.PNG',
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                },
+                {
+                    id: 2,
+                    name: 'TESTE',
+                    path: '75c5602fff40a5d6b30a89895de120e2.png',
                     created_at: new Date(),
                     updated_at: new Date(),
                 },

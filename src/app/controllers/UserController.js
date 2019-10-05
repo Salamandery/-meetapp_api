@@ -6,6 +6,7 @@ import File from '../models/Files';
 
 class UserController {
     async index(req, res) {
+        // Listando usuários
         const users = await User.findAll({
             attributes: ['name', 'email', 'provider', 'created_at'],
             include: {
@@ -29,7 +30,7 @@ class UserController {
                 .required()
                 .min(6),
         });
-
+        // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
             return res
                 .status(400)
@@ -71,7 +72,7 @@ class UserController {
                 password ? field.required().oneOf([Yup.ref('password')]) : field
             ),
         });
-
+        // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
             return res
                 .status(400)

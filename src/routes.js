@@ -17,6 +17,8 @@ import EventsController from './app/controllers/EventController';
 import ProviderController from './app/controllers/ProviderController';
 // Agendamento
 import ScheduleController from './app/controllers/ScheduleController';
+// Agendamento
+import NotificationController from './app/controllers/NotificationController';
 
 // Iniciando rotas
 const routes = new Router();
@@ -35,6 +37,8 @@ routes.get('/providers', ProviderController.index);
 routes.get('/events', EventsController.index);
 // Listagem de eventos
 routes.get('/schedules', ScheduleController.index);
+// Listagem de notificações
+routes.get('/notifications', NotificationController.index);
 // Cadastro de usuários
 routes.post('/users', UserController.store);
 // Cadastro e upload de imagem
@@ -45,5 +49,7 @@ routes.post('/events', EventsController.store);
 routes.put('/users', UserController.update);
 // Atualização do cadastro de eventos
 routes.put('/events', EventsController.update);
+// Atualização do cadastro de eventos
+routes.put('/notifications/:id', NotificationController.update);
 
 module.exports = routes;

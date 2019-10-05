@@ -1,6 +1,9 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
-import { startOfHour, parseISO, isBefore } from 'date-fns';
+// Tratamento de datas
+import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+// Tradução
+import pt from 'date-fns/locale/pt-BR';
 // Modelos
 // Usuário
 import User from '../models/Users';
@@ -8,6 +11,9 @@ import User from '../models/Users';
 import File from '../models/Files';
 // Eventos
 import Event from '../models/Events';
+// Schema
+// Notificação
+import Notification from '../schema/Notifications';
 
 class EventController {
     async index(req, res) {
@@ -69,6 +75,7 @@ class EventController {
             location,
             banner_id,
         } = req.body;
+
         // Verifica se o usuário é provedor e existe
         const isProvider = await User.findOne({
             where: {
@@ -79,6 +86,12 @@ class EventController {
         // Erro caso não seja ou não exista
         if (!isProvider) {
             return res.status(401).json({ msg: 'Provedor inexistente.' });
+        }
+        // Usuário não pode fazer agendamento com ele mesmo
+        if (provider_id === req.userId) {
+            return res
+                .status(401)
+                .json({ msg: 'Não é permitido criar um evento' });
         }
         // Conversão de data
         const hourStart = startOfHour(parseISO(date));
@@ -106,7 +119,20 @@ class EventController {
             location,
             banner_id,
         });
-
+        // Notificação de Evento
+        // Pegando dados do usuário
+        const user = await User.findByPk(req.userId);
+        // Formatando data para dia dd de mês às hh:mi
+        const formattedDate = format(
+            hourStart,
+            "'dia' dd 'de' MMMM', às' H:mm'h'",
+            { locale: pt }
+        );
+        // Gerando notificação
+        await Notification.create({
+            content: `Novo evento agendado por: ${user.name} no ${formattedDate}`,
+            user: provider_id,
+        });
         return res.json(Events);
     }
 
@@ -180,7 +206,15 @@ class EventController {
             location,
             banner_id,
         });
+        // Notificação de Evento
+        // Pegando dados do usuário
+        const user = await User.findByPk(req.userId);
 
+        // Gerando notificação
+        await Notification.create({
+            content: `O evento ${name} foi modificado por: ${user.name}`,
+            user: provider_id,
+        });
         return res.json(Events);
     }
 }
