@@ -51,5 +51,7 @@ routes.put('/users', UserController.update);
 routes.put('/events', EventsController.update);
 // Atualização do cadastro de eventos
 routes.put('/notifications/:id', NotificationController.update);
+// Deletando o cadastro de eventos
+routes.delete('/events/:id', EventsController.delete);
 
 module.exports = routes;

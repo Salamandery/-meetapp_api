@@ -1,5 +1,8 @@
 import Sequelize, { Model } from 'sequelize';
 
+// Variaveis de ambiente
+require('dotenv').config();
+
 class Files extends Model {
     static init(sequelize) {
         super.init(
@@ -9,7 +12,7 @@ class Files extends Model {
                 url: {
                     type: Sequelize.VIRTUAL,
                     get() {
-                        return `http://localhost:3333/files/${this.path}`;
+                        return `${process.env.SERVERIP}:${process.env.PORTA}${process.env.FILEPATH}${this.path}`;
                     },
                 },
             },

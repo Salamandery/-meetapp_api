@@ -1,14 +1,15 @@
 {
-  "name": "meetup_api",
+  "name": "meetapp_api",
   "version": "1.0.0",
-  "description": "meetup_backend",
+  "description": "meetapp_backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "queue": "nodemon queue"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Salamandery/-meetup_api.git"
+    "url": "git+https://github.com/Salamandery/-meetapp_api.git"
   },
   "keywords": [
     "backend"
@@ -16,17 +17,21 @@
   "author": "Rodolfo M F Abreu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Salamandery/-meetup_api/issues"
+    "url": "https://github.com/Salamandery/-meetapp_api/issues"
   },
-  "homepage": "https://github.com/Salamandery/-meetup_api#readme",
+  "homepage": "https://github.com/Salamandery/-meetapp_api#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "bee-queue": "^1.2.2",
     "date-fns": "^2.0.0-beta.5",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.3",
     "multer": "^1.4.2",
+    "nodemailer": "^6.3.0",
+    "nodemailer-express-handlebars": "^3.1.0",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.19.2",

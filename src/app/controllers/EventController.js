@@ -1,9 +1,14 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
 // Tratamento de datas
-import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 // Tradução
 import pt from 'date-fns/locale/pt-BR';
+// Fila de ações
+import Queue from '../../lib/Queue';
+// Job
+// Cancelamento
+import Cancelation from '../../jobs/Cancelation';
 // Modelos
 // Usuário
 import User from '../models/Users';
@@ -162,7 +167,7 @@ class EventController {
             banner_id,
         } = req.body;
         // Verifica se o usuário é provedor e existe
-        const Exists = await User.findOne({
+        const Exists = await Event.findOne({
             where: {
                 name,
                 date,
@@ -173,6 +178,12 @@ class EventController {
         // Erro caso não seja ou não exista
         if (!Exists) {
             return res.status(401).json({ msg: 'Evento não encontrado.' });
+        }
+        // Se não for o criador do evento gera error
+        if (Exists.user_id !== req.userId) {
+            return res
+                .status(401)
+                .json({ msg: 'Apenas quem criou o evento pode modificá-lo.' });
         }
         // Conversão de data
         const hourStart = startOfHour(parseISO(date));
@@ -216,6 +227,49 @@ class EventController {
             user: provider_id,
         });
         return res.json(Events);
+    }
+
+    async delete(req, res) {
+        // Varivaves da url
+        const { id } = req.params;
+        // Verificando se existe agendamento
+        const Exists = await Event.findByPk(id, {
+            include: [
+                { attributes: ['name', 'email'], model: User, as: 'provider' },
+            ],
+        });
+        // Se não for o criador do evento gera error
+        if (Exists.user_id !== req.userId) {
+            return res
+                .status(401)
+                .json({ msg: 'Apenas quem criou o evento pode cancelá-lo.' });
+        }
+        // Verificação de horário limite para cancelar
+        const dateWithSub = subHours(Exists.date, 2);
+        // Verificação com a data atual
+        if (isBefore(dateWithSub, new Date())) {
+            return res.status(401).json({
+                msg:
+                    'Não é possivel cancelar evento que ultrapassaram o limite de 2h.',
+            });
+        }
+        // Cancelando na data atual
+        Exists.canceled_at = new Date();
+        // Atualizando informações
+        await Exists.save();
+        // Formatando data para dia dd de mês às hh:mi
+        const formattedDate = format(
+            Exists.date,
+            "'dia' dd 'de' MMMM', às' H:mm'h'",
+            { locale: pt }
+        );
+        // Iniciando trabalho de envio de email para confirmação de cancelamento
+        await Queue.add(Cancelation.key, {
+            Exists,
+            formattedDate,
+        });
+
+        return res.json(Exists);
     }
 }
 
