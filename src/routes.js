@@ -13,8 +13,6 @@ import SessionController from './app/controllers/SessionController';
 import FileController from './app/controllers/FileController';
 // Events
 import EventsController from './app/controllers/EventController';
-// Provedores
-import ProviderController from './app/controllers/ProviderController';
 // Agendamento
 import ScheduleController from './app/controllers/ScheduleController';
 // Agendamento
@@ -31,8 +29,6 @@ routes.post('/sessions', SessionController.store);
 routes.use(auth);
 // Listagem de usuários
 routes.get('/users', UserController.index);
-// Listagem de Provedores de serviço
-routes.get('/providers', ProviderController.index);
 // Listagem de eventos
 routes.get('/events', EventsController.index);
 // Listagem de eventos

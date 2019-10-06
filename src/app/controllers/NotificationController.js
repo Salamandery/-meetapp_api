@@ -7,18 +7,17 @@ import Notifications from '../schema/Notifications';
 
 class NotificationController {
     async index(req, res) {
-        // Verifica se o usuário é provedor e existe
-        const isProvider = await User.findOne({
+        // Verifica se o usuário é Válido e existe
+        const isUser = await User.findOne({
             where: {
                 id: req.userId,
-                provider: true,
             },
         });
         // Erro caso não seja ou não exista
-        if (!isProvider) {
+        if (!isUser) {
             return res
                 .status(401)
-                .json({ msg: 'Acesso permitido apenas para provedores.' });
+                .json({ msg: 'Acesso permitido apenas para usuários.' });
         }
         // Listando notificações do usuário logado
         const notification = await Notifications.find({

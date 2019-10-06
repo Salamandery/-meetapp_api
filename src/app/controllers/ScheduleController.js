@@ -11,16 +11,15 @@ class ScheduleController {
     async index(req, res) {
         // Valores passado pela url
         const { page } = req.query;
-        // Verifica se o usuário é provedor e existe
-        const isProvider = await User.findOne({
+        // Verifica se o usuário é válido e existe
+        const isUser = await User.findOne({
             where: {
                 id: req.userId,
-                provider: true,
             },
         });
         // Erro caso não seja ou não exista
-        if (!isProvider) {
-            return res.status(401).json({ msg: 'Provedor inexistente.' });
+        if (!isUser) {
+            return res.status(401).json({ msg: 'Usuário inexistente.' });
         }
         // Listagem de eventos
         const Events = await Event.findAll({
@@ -46,7 +45,7 @@ class ScheduleController {
                 },
                 {
                     model: User,
-                    as: 'provider',
+                    as: 'user',
                     attributes: ['id', 'name', 'email'],
                 },
             ],
