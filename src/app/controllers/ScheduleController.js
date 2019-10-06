@@ -57,8 +57,9 @@ class ScheduleController {
     }
 
     async store(req, res) {
+        // Variaveis da url
         const { id } = req.params;
-
+        // Se usuario criou o evento
         const isUser = await Event.findOne({
             where: {
                 id,
@@ -66,9 +67,22 @@ class ScheduleController {
             },
         });
 
-        if (!isUser) {
+        if (isUser) {
             return res.status(401).json({
                 msg: 'Não é possível se increver em um evento que você criou.',
+            });
+        }
+        // Se já foi inscrito
+        const Exists = await UserEvent.findOne({
+            where: {
+                user_id: req.userId,
+                event_id: id,
+            },
+        });
+
+        if (Exists) {
+            return res.status(401).json({
+                msg: 'Você já foi inscrito nesse evento.',
             });
         }
 
