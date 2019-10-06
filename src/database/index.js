@@ -7,12 +7,14 @@ import User from '../app/models/Users';
 import Files from '../app/models/Files';
 // Eventos
 import Events from '../app/models/Events';
+// Incrições
+import UserEvent from '../app/models/UserEvent';
 
 // Configurações do db
 import conf from '../config/database';
 
 // Lista de models
-const models = [User, Files, Events];
+const models = [User, Files, Events, UserEvent];
 
 class Database {
     constructor() {

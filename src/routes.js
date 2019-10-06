@@ -41,6 +41,8 @@ routes.post('/users', UserController.store);
 routes.post('/files', upload.single('file'), FileController.store);
 // Cadastro de eventos
 routes.post('/events', EventsController.store);
+// Cadastro de inscrição
+routes.post('/schedules/:id', ScheduleController.store);
 // Atualização do cadastro do usuário
 routes.put('/users', UserController.update);
 // Atualização do cadastro de eventos

@@ -145,7 +145,7 @@ class EventController {
         // Validação
         const schema = Yup.object().shape({
             date: Yup.date().required(),
-            provider_id: Yup.number().required(),
+            user_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
             location: Yup.string().required(),
@@ -159,7 +159,7 @@ class EventController {
         }
         // Relacionamento e filtros
         const {
-            provider_id,
+            user_id,
             date,
             name,
             description,
@@ -172,7 +172,7 @@ class EventController {
                 name,
                 date,
                 description,
-                provider_id,
+                user_id,
             },
         });
         // Erro caso não seja ou não exista
@@ -193,7 +193,7 @@ class EventController {
         }
         // Verifica disponibilidade
         const checkCancelado = await Event.findOne({
-            where: { provider_id, canceled_at: { [Op.ne]: null } },
+            where: { user_id, canceled_at: { [Op.ne]: null } },
         });
         // Se já existir gera erro
         if (checkCancelado) {
@@ -201,7 +201,7 @@ class EventController {
         }
         // Verifica disponibilidade
         const checkConcluido = await Event.findOne({
-            where: { provider_id, successed_at: { [Op.ne]: null } },
+            where: { user_id, successed_at: { [Op.ne]: null } },
         });
         // Se já existir gera erro
         if (checkConcluido) {
@@ -210,7 +210,6 @@ class EventController {
         // Cria evento se tudo ok
         const Events = await Event.create({
             user_id: req.userId,
-            provider_id,
             date,
             name,
             description,
@@ -224,7 +223,7 @@ class EventController {
         // Gerando notificação
         await Notification.create({
             content: `O evento ${name} foi modificado por: ${user.name}`,
-            user: provider_id,
+            user: req.userId,
         });
         return res.json(Events);
     }

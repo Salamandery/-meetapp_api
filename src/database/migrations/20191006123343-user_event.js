@@ -1,28 +1,12 @@
-// Migration da tabela de arquivos
+// Relação de usuários inscritos
 module.exports = {
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('events', {
+        return queryInterface.createTable('user_events', {
             id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
-            },
-            name: {
-                type: Sequelize.STRING,
-                allowNull: false,
-            },
-            description: {
-                type: Sequelize.STRING,
-                allowNull: false,
-            },
-            location: {
-                type: Sequelize.STRING,
-                allowNull: false,
-            },
-            date: {
-                allowNull: false,
-                type: Sequelize.DATE,
             },
             user_id: {
                 type: Sequelize.INTEGER,
@@ -31,11 +15,12 @@ module.exports = {
                 onDelete: 'SET NULL',
                 allowNull: true,
             },
-            successed_at: {
-                type: Sequelize.DATE,
-            },
-            canceled_at: {
-                type: Sequelize.DATE,
+            event_id: {
+                type: Sequelize.INTEGER,
+                references: { model: 'events', key: 'id' },
+                onUpdate: 'CASCADE',
+                onDelete: 'SET NULL',
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
@@ -49,6 +34,6 @@ module.exports = {
     },
 
     down: queryInterface => {
-        return queryInterface.dropTable('events');
+        return queryInterface.dropTable('user_events');
     },
 };

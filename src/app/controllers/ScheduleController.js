@@ -6,6 +6,8 @@ import User from '../models/Users';
 import File from '../models/Files';
 // Modelo do usuário
 import Event from '../models/Events';
+// Modelo relacional de usuários e eventos para inscrição
+import UserEvent from '../models/UserEvent';
 
 class ScheduleController {
     async index(req, res) {
@@ -31,7 +33,7 @@ class ScheduleController {
                 'successed_at',
             ],
             where: {
-                provider_id: req.userId,
+                user_id: req.userId,
                 canceled_at: null,
                 [Op.or]: { successed_at: null },
             },
@@ -52,6 +54,30 @@ class ScheduleController {
         });
 
         return res.json(Events);
+    }
+
+    async store(req, res) {
+        const { id } = req.params;
+
+        const isUser = await Event.findOne({
+            where: {
+                id,
+                user_id: req.userId,
+            },
+        });
+
+        if (!isUser) {
+            return res.status(401).json({
+                msg: 'Não é possível se increver em um evento que você criou.',
+            });
+        }
+
+        const response = await UserEvent.create({
+            user_id: req.userId,
+            event_id: id,
+        });
+
+        return res.json(response);
     }
 }
 
