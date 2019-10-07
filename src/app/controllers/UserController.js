@@ -8,7 +8,7 @@ class UserController {
     async index(req, res) {
         // Listando usuários
         const users = await User.findAll({
-            attributes: ['name', 'email', 'provider', 'created_at'],
+            attributes: ['name', 'email', 'created_at'],
             include: {
                 model: File,
                 as: 'avatar',

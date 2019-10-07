@@ -4,7 +4,6 @@ module.exports = {
             'events',
             [
                 {
-                    id: 1,
                     name: 'Encontro dos programadores metaleiros',
                     description: 'DESCRICAO DO EVENTO',
                     location: 'LOCALIZACAO DO EVENTO',
@@ -15,7 +14,6 @@ module.exports = {
                     updated_at: new Date(),
                 },
                 {
-                    id: 2,
                     name: 'Encontro dos programadores pagodeiros',
                     description: 'DESCRICAO DO EVENTO',
                     location: 'LOCALIZACAO DO EVENTO',
@@ -26,7 +24,6 @@ module.exports = {
                     updated_at: new Date(),
                 },
                 {
-                    id: 3,
                     name: 'Encontro com Filipe Deschamps Teló',
                     description: 'DESCRICAO DO EVENTO',
                     location: 'LOCALIZACAO DO EVENTO',

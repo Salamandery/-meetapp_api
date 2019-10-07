@@ -4,7 +4,6 @@ module.exports = {
             'users',
             [
                 {
-                    id: 1,
                     name: 'Diego Fernandes',
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',
@@ -14,7 +13,6 @@ module.exports = {
                     updated_at: new Date(),
                 },
                 {
-                    id: 2,
                     name: 'Filipe D Telo',
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',
@@ -24,7 +22,6 @@ module.exports = {
                     updated_at: new Date(),
                 },
                 {
-                    id: 3,
                     name: 'Rodolfo M F Abreu',
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',

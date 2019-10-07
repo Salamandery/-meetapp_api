@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import { Op } from 'sequelize';
 // Tratamento de datas
 import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 // Tradução
@@ -39,7 +38,7 @@ class EventController {
                 },
                 {
                     model: User,
-                    as: 'provider',
+                    as: 'user',
                     attributes: ['id', 'name'],
                     include: [
                         {
@@ -59,7 +58,7 @@ class EventController {
         // Validação
         const schema = Yup.object().shape({
             date: Yup.date().required(),
-            provider_id: Yup.number().required(),
+            user_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
             location: Yup.string().required(),
@@ -72,31 +71,17 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const {
-            provider_id,
-            date,
-            name,
-            description,
-            location,
-            banner_id,
-        } = req.body;
+        const { date, name, description, location, banner_id } = req.body;
 
-        // Verifica se o usuário é provedor e existe
-        const isProvider = await User.findOne({
+        // Verifica se o usuário existe
+        const isUser = await User.findOne({
             where: {
-                id: provider_id,
-                provider: true,
+                id: req.userId,
             },
         });
         // Erro caso não seja ou não exista
-        if (!isProvider) {
-            return res.status(401).json({ msg: 'Provedor inexistente.' });
-        }
-        // Usuário não pode fazer agendamento com ele mesmo
-        if (provider_id === req.userId) {
-            return res
-                .status(401)
-                .json({ msg: 'Não é permitido criar um evento' });
+        if (!isUser) {
+            return res.status(401).json({ msg: 'Usuário inexistente.' });
         }
         // Conversão de data
         const hourStart = startOfHour(parseISO(date));
@@ -106,7 +91,11 @@ class EventController {
         }
         // Verifica disponibilidade
         const checkHour = await Event.findOne({
-            where: { provider_id, canceled_at: null, date: hourStart },
+            where: {
+                user_id: req.userId,
+                canceled_at: null,
+                date: parseISO(date),
+            },
         });
         // Se já existir gera erro
         if (checkHour) {
@@ -117,7 +106,6 @@ class EventController {
         // Cria evento se tudo ok
         const Events = await Event.create({
             user_id: req.userId,
-            provider_id,
             date,
             name,
             description,
@@ -136,7 +124,7 @@ class EventController {
         // Gerando notificação
         await Notification.create({
             content: `Novo evento agendado por: ${user.name} no ${formattedDate}`,
-            user: provider_id,
+            user: req.userId,
         });
         return res.json(Events);
     }
@@ -158,21 +146,11 @@ class EventController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
         // Relacionamento e filtros
-        const {
-            user_id,
-            date,
-            name,
-            description,
-            location,
-            banner_id,
-        } = req.body;
+        const { id, date, name, description, location, banner_id } = req.body;
         // Verifica se o usuário é provedor e existe
         const Exists = await Event.findOne({
             where: {
-                name,
-                date,
-                description,
-                user_id,
+                id,
             },
         });
         // Erro caso não seja ou não exista
@@ -193,22 +171,22 @@ class EventController {
         }
         // Verifica disponibilidade
         const checkCancelado = await Event.findOne({
-            where: { user_id, canceled_at: { [Op.ne]: null } },
+            where: { id, canceled_at: null },
         });
         // Se já existir gera erro
-        if (checkCancelado) {
+        if (!checkCancelado) {
             return res.status(401).json({ msg: 'Evento foi cancelado.' });
         }
         // Verifica disponibilidade
         const checkConcluido = await Event.findOne({
-            where: { user_id, successed_at: { [Op.ne]: null } },
+            where: { id, successed_at: null },
         });
         // Se já existir gera erro
-        if (checkConcluido) {
+        if (!checkConcluido) {
             return res.status(401).json({ msg: 'Evento já foi concluído.' });
         }
         // Cria evento se tudo ok
-        const Events = await Event.create({
+        const Events = await Exists.update({
             user_id: req.userId,
             date,
             name,
@@ -234,7 +212,7 @@ class EventController {
         // Verificando se existe agendamento
         const Exists = await Event.findByPk(id, {
             include: [
-                { attributes: ['name', 'email'], model: User, as: 'provider' },
+                { attributes: ['name', 'email'], model: User, as: 'user' },
             ],
         });
         // Se não for o criador do evento gera error
@@ -255,7 +233,11 @@ class EventController {
         // Cancelando na data atual
         Exists.canceled_at = new Date();
         // Atualizando informações
-        await Exists.save();
+        await Event.destroy({
+            where: {
+                id,
+            },
+        });
         // Formatando data para dia dd de mês às hh:mi
         const formattedDate = format(
             Exists.date,
