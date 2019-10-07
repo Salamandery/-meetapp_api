@@ -1,13 +1,8 @@
 import * as Yup from 'yup';
 // Tratamento de datas
-import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format } from 'date-fns';
 // Tradução
 import pt from 'date-fns/locale/pt-BR';
-// Fila de ações
-import Queue from '../../lib/Queue';
-// Job
-// Cancelamento
-import Cancelation from '../../jobs/Cancelation';
 // Modelos
 // Usuário
 import User from '../models/Users';
@@ -25,11 +20,11 @@ class EventController {
         const { page = 1 } = req.query;
         // Listagem com limite de paginação * 20
         const event = await Event.findAll({
-            where: { user_id: req.userId, canceled_at: null },
+            where: { user_id: req.userId },
             order: ['date'],
             limit: 20,
             offset: (page - 1) * 20,
-            attributes: ['id', 'date'],
+            attributes: ['id', 'date', 'location', 'description'],
             include: [
                 {
                     model: File,
@@ -58,7 +53,6 @@ class EventController {
         // Validação
         const schema = Yup.object().shape({
             date: Yup.date().required(),
-            user_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
             location: Yup.string().required(),
@@ -133,7 +127,6 @@ class EventController {
         // Validação
         const schema = Yup.object().shape({
             date: Yup.date().required(),
-            user_id: Yup.number().required(),
             name: Yup.string().required(),
             description: Yup.string().required(),
             location: Yup.string().required(),
@@ -221,33 +214,11 @@ class EventController {
                 .status(401)
                 .json({ msg: 'Apenas quem criou o evento pode cancelá-lo.' });
         }
-        // Verificação de horário limite para cancelar
-        const dateWithSub = subHours(Exists.date, 2);
-        // Verificação com a data atual
-        if (isBefore(dateWithSub, new Date())) {
-            return res.status(401).json({
-                msg:
-                    'Não é possivel cancelar evento que ultrapassaram o limite de 2h.',
-            });
-        }
-        // Cancelando na data atual
-        Exists.canceled_at = new Date();
         // Atualizando informações
         await Event.destroy({
             where: {
                 id,
             },
-        });
-        // Formatando data para dia dd de mês às hh:mi
-        const formattedDate = format(
-            Exists.date,
-            "'dia' dd 'de' MMMM', às' H:mm'h'",
-            { locale: pt }
-        );
-        // Iniciando trabalho de envio de email para confirmação de cancelamento
-        await Queue.add(Cancelation.key, {
-            Exists,
-            formattedDate,
         });
 
         return res.json(Exists);

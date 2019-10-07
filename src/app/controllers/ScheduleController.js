@@ -1,4 +1,7 @@
-import { parseISO, endOfDay } from 'date-fns';
+import { parseISO, endOfDay, format } from 'date-fns';
+// Tradução
+import { pt } from 'date-fns/locale/pt-BR';
+// Sequelize options
 import { Op } from 'sequelize';
 // import * as Yup from 'yup';
 // Modelo do usuário
@@ -9,6 +12,10 @@ import File from '../models/Files';
 import Event from '../models/Events';
 // Modelo relacional de usuários e eventos para inscrição
 import UserEvent from '../models/UserEvent';
+// Fila de ações
+import Queue from '../../lib/Queue';
+// Mail
+import Subscribe from '../../jobs/Subscribe';
 
 class ScheduleController {
     async index(req, res) {
@@ -28,33 +35,42 @@ class ScheduleController {
         // Verificação de data
         const data = endOfDay(parseISO(date));
         // Listagem de eventos
-        const Events = await Event.findAll({
-            attributes: [
-                'name',
-                'description',
-                'date',
-                'canceled_at',
-                'successed_at',
-            ],
+        const Events = await UserEvent.findAll({
+            attributes: ['event_id'],
             where: {
                 user_id: req.userId,
-                date: { [Op.lte]: data },
-                [Op.or]: { successed_at: null, canceled_at: null },
             },
-            limit: 20,
-            offset: (page - 1) * 20,
-            include: [
-                {
-                    model: File,
-                    as: 'banner',
-                    attributes: ['name', 'path', 'url'],
+            limit: 10,
+            offset: (page - 1) * 10,
+            include: {
+                model: Event,
+                as: 'event',
+                attributes: [
+                    'name',
+                    'description',
+                    'location',
+                    'date',
+                    'canceled_at',
+                    'successed_at',
+                ],
+                where: {
+                    date: { [Op.lte]: data },
+                    [Op.or]: { successed_at: null, canceled_at: null },
                 },
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'name', 'email'],
-                },
-            ],
+                order: [['date', 'DESC']],
+                include: [
+                    {
+                        model: File,
+                        as: 'banner',
+                        attributes: ['name', 'path', 'url'],
+                    },
+                    {
+                        model: User,
+                        as: 'user',
+                        attributes: ['id', 'name', 'email'],
+                    },
+                ],
+            },
         });
 
         return res.json(Events);
@@ -127,6 +143,21 @@ class ScheduleController {
         const response = await UserEvent.create({
             user_id: req.userId,
             event_id: id,
+        });
+        // Dados do usuário
+        const user = await User.findByPk(req.userId);
+
+        // Formatando data para dia dd de mês às hh:mi
+        const formattedDate = format(
+            isEvent.date,
+            "'dia' dd 'de' MMMM', às' H:mm'h'",
+            { locale: pt }
+        );
+        // Iniciando trabalho de envio de email para confirmação de cancelamento
+        await Queue.add(Subscribe.key, {
+            Exists: user,
+            formattedDate,
+            username: user.name,
         });
 
         return res.json(response);

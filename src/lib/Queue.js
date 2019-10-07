@@ -3,9 +3,9 @@ import Bee from 'bee-queue';
 import conf from '../config/redis';
 // Jobs
 // Email de cancelamento
-import Cancelation from '../jobs/Cancelation';
+import Subscribe from '../jobs/Subscribe';
 
-const jobs = [Cancelation];
+const jobs = [Subscribe];
 
 class Queue {
     constructor() {
