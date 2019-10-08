@@ -1,8 +1,6 @@
 import * as Yup from 'yup';
 // Modelo do usuário
 import User from '../models/Users';
-// Modelo do usuário
-import File from '../models/Files';
 
 class UserController {
     async index(req, res) {
@@ -12,11 +10,6 @@ class UserController {
                 id: req.userId,
             },
             attributes: ['id', 'name', 'email', 'created_at'],
-            include: {
-                model: File,
-                as: 'avatar',
-                attributes: ['name', 'path', 'url'],
-            },
         });
 
         return res.json(users);
@@ -105,6 +98,7 @@ class UserController {
         // Atualização do usuário
         const user = await Exists.update(req.body);
 
+        user.password = undefined;
         user.password_hash = undefined;
 
         return res.json({ msg: 'Alteração realizada com sucesso', user });

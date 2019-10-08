@@ -24,12 +24,6 @@ class User extends Model {
         return this;
     }
 
-    // FK
-    static associate(models) {
-        // FK id do arquivo
-        this.belongsTo(models.Files, { foreignKey: 'avatar_id', as: 'avatar' });
-    }
-
     checkPassword(password) {
         // Verifica se a senha está correta
         return bcrypt.compare(password, this.password_hash);

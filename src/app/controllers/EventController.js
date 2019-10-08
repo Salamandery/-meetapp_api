@@ -34,14 +34,7 @@ class EventController {
                 {
                     model: User,
                     as: 'user',
-                    attributes: ['id', 'name'],
-                    include: [
-                        {
-                            model: File,
-                            as: 'avatar',
-                            attributes: ['id', 'path', 'url'],
-                        },
-                    ],
+                    attributes: ['id', 'name', 'email'],
                 },
             ],
         });
