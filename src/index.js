@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 // Resolvendo rotas
 import { resolve } from 'path';
 import env from 'dotenv';
@@ -18,6 +19,7 @@ class App {
     }
 
     middlewares() {
+	this.server.use(cors());
         // Requisições do tipo json
         this.server.use(express.json());
         // Requisições estáticas

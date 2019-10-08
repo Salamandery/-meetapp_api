@@ -20,7 +20,7 @@ class Database {
     constructor() {
         // Inicializando
         this.init();
-        // this.mongo();
+        this.mongo();
     }
 
     init() {

@@ -120,6 +120,7 @@ class EventController {
             content: `Novo evento agendado por: ${user.name} no ${formattedDate}`,
             user: req.userId,
         });
+
         return res.json(Events);
     }
 
@@ -140,7 +141,7 @@ class EventController {
         }
         // Relacionamento e filtros
         const { id, date, name, description, location, banner_id } = req.body;
-        // Verifica se o usuário é provedor e existe
+        // Verifica se o usuário existe
         const Exists = await Event.findOne({
             where: {
                 id,
