@@ -24,7 +24,7 @@ class EventController {
             order: ['date'],
             limit: 20,
             offset: (page - 1) * 20,
-            attributes: ['id', 'date', 'location', 'description'],
+            attributes: ['id', 'date', 'name', 'location', 'description'],
             include: [
                 {
                     model: File,
@@ -46,7 +46,20 @@ class EventController {
             ],
         });
 
-        return res.json(event);
+        // Formatando data para dia dd de mês às hh:mi
+        const eventsFormatted = event.map(ev => ({
+            id: ev.id,
+            name: ev.name,
+            description: ev.description,
+            location: ev.location,
+            user: ev.user,
+            banner: ev.banner,
+            date: format(ev.date, "'dia' dd 'de' MMMM', às' H:mm'h'", {
+                locale: pt,
+            }),
+        }));
+
+        return res.json(eventsFormatted);
     }
 
     async store(req, res) {

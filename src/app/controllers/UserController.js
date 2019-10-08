@@ -7,7 +7,10 @@ import File from '../models/Files';
 class UserController {
     async index(req, res) {
         // Listando usuários
-        const users = await User.findAll({
+        const users = await User.findOne({
+            where: {
+                id: req.userId,
+            },
             attributes: ['id', 'name', 'email', 'created_at'],
             include: {
                 model: File,
