@@ -8,7 +8,6 @@ module.exports = {
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',
                     email: 'Diego@rocketseat.com.br',
-                    avatar_id: 2,
                     created_at: new Date(),
                     updated_at: new Date(),
                 },
@@ -17,7 +16,6 @@ module.exports = {
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',
                     email: 'Filipe@filipetelo.com.br',
-                    avatar_id: 2,
                     created_at: new Date(),
                     updated_at: new Date(),
                 },
@@ -26,7 +24,6 @@ module.exports = {
                     password_hash:
                         '$2a$08$PEF3Eubm1dqJaid2VhAoOez/2gUO3FRrVdryiCQfUAS7ZSvYUNWyq',
                     email: 'Rodolfo@atomiccodes.com.br',
-                    avatar_id: 2,
                     created_at: new Date(),
                     updated_at: new Date(),
                 },

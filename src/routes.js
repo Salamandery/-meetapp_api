@@ -15,8 +15,8 @@ import FileController from './app/controllers/FileController';
 import EventsController from './app/controllers/EventController';
 // Agendamento
 import ScheduleController from './app/controllers/ScheduleController';
-// Agendamento
-import NotificationController from './app/controllers/NotificationController';
+// Inscrições
+import SubscribeController from './app/controllers/SubscribeController';
 
 // Iniciando rotas
 const routes = new Router();
@@ -25,30 +25,28 @@ const upload = multer(conf);
 // Rotas
 // Definição de sessão
 routes.post('/sessions', SessionController.store);
+// Cadastro de usuários
+routes.post('/users', UserController.store);
 // Necessário autenticar antes de navegar abaixo
 routes.use(auth);
 // Listagem de usuários
 routes.get('/users', UserController.index);
 // Listagem de eventos
 routes.get('/events', EventsController.index);
-// Listagem de eventos
+// Listagem de eventos por data
 routes.get('/schedules', ScheduleController.index);
-// Listagem de notificações
-routes.get('/notifications', NotificationController.index);
-// Cadastro de usuários
-routes.post('/users', UserController.store);
+// Lista de inscrição
+routes.get('/subscribe/', SubscribeController.index);
 // Cadastro e upload de imagem
 routes.post('/files', upload.single('file'), FileController.store);
 // Cadastro de eventos
 routes.post('/events', EventsController.store);
 // Cadastro de inscrição
-routes.post('/schedules/:id', ScheduleController.store);
+routes.post('/subscribe/:id', SubscribeController.store);
 // Atualização do cadastro do usuário
 routes.put('/users', UserController.update);
 // Atualização do cadastro de eventos
 routes.put('/events', EventsController.update);
-// Atualização do cadastro de eventos
-routes.put('/notifications/:id', NotificationController.update);
 // Deletando o cadastro de eventos
 routes.delete('/events/:id', EventsController.delete);
 

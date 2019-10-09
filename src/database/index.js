@@ -1,5 +1,4 @@
 import Sequelize from 'sequelize';
-import mongo from 'mongoose';
 // Models
 // Usuários
 import User from '../app/models/Users';
@@ -20,7 +19,6 @@ class Database {
     constructor() {
         // Inicializando
         this.init();
-        this.mongo();
     }
 
     init() {
@@ -33,14 +31,6 @@ class Database {
                 model =>
                     model.associate && model.associate(this.connection.models)
             );
-    }
-
-    mongo() {
-        this.mongoConnection = mongo.connect(process.env.MONGOURL, {
-            useNewUrlParser: true,
-            useFindAndModify: true,
-            useUnifiedTopology: true,
-        });
     }
 }
 

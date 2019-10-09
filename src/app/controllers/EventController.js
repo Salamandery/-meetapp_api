@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import * as Yup from 'yup';
 // Tratamento de datas
 import { startOfHour, parseISO, isBefore, format } from 'date-fns';
@@ -10,17 +11,16 @@ import User from '../models/Users';
 import File from '../models/Files';
 // Eventos
 import Event from '../models/Events';
-// Schema
-// Notificação
-import Notification from '../schema/Notifications';
 
 class EventController {
     async index(req, res) {
         // Paginação enviada pela url
         const { page = 1 } = req.query;
+        // Data atual
+        const Now = new Date();
         // Listagem com limite de paginação * 20
         const event = await Event.findAll({
-            where: { user_id: req.userId },
+            where: { user_id: req.userId, date: { [Op.gte]: Now } },
             order: ['date'],
             limit: 20,
             offset: (page - 1) * 20,
@@ -29,7 +29,7 @@ class EventController {
                 {
                     model: File,
                     as: 'banner',
-                    attributes: ['name', 'path', 'url'],
+                    attributes: ['id', 'name', 'path', 'url'],
                 },
                 {
                     model: User,
@@ -89,20 +89,7 @@ class EventController {
         if (isBefore(hourStart, new Date())) {
             return res.status(401).json({ msg: 'Data não permitida.' });
         }
-        // Verifica disponibilidade
-        const checkHour = await Event.findOne({
-            where: {
-                user_id: req.userId,
-                canceled_at: null,
-                date: parseISO(date),
-            },
-        });
-        // Se já existir gera erro
-        if (checkHour) {
-            return res
-                .status(401)
-                .json({ msg: 'Horário não é válido para cadastro.' });
-        }
+
         // Cria evento se tudo ok
         const Events = await Event.create({
             user_id: req.userId,
@@ -111,20 +98,6 @@ class EventController {
             description,
             location,
             banner_id,
-        });
-        // Notificação de Evento
-        // Pegando dados do usuário
-        const user = await User.findByPk(req.userId);
-        // Formatando data para dia dd de mês às hh:mi
-        const formattedDate = format(
-            hourStart,
-            "'dia' dd 'de' MMMM', às' H:mm'h'",
-            { locale: pt }
-        );
-        // Gerando notificação
-        await Notification.create({
-            content: `Novo evento agendado por: ${user.name} no ${formattedDate}`,
-            user: req.userId,
         });
 
         return res.json(Events);
@@ -171,20 +144,13 @@ class EventController {
         }
         // Verifica disponibilidade
         const checkCancelado = await Event.findOne({
-            where: { id, canceled_at: null },
+            where: { id },
         });
         // Se já existir gera erro
         if (!checkCancelado) {
             return res.status(401).json({ msg: 'Evento foi cancelado.' });
         }
-        // Verifica disponibilidade
-        const checkConcluido = await Event.findOne({
-            where: { id, successed_at: null },
-        });
-        // Se já existir gera erro
-        if (!checkConcluido) {
-            return res.status(401).json({ msg: 'Evento já foi concluído.' });
-        }
+
         // Cria evento se tudo ok
         const Events = await Exists.update({
             user_id: req.userId,
@@ -194,15 +160,7 @@ class EventController {
             location,
             banner_id,
         });
-        // Notificação de Evento
-        // Pegando dados do usuário
-        const user = await User.findByPk(req.userId);
 
-        // Gerando notificação
-        await Notification.create({
-            content: `O evento ${name} foi modificado por: ${user.name}`,
-            user: req.userId,
-        });
         return res.json(Events);
     }
 

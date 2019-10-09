@@ -1,6 +1,4 @@
-import { parseISO, endOfDay, format } from 'date-fns';
-// Tradução
-import { pt } from 'date-fns/locale/pt-BR';
+import { parseISO, endOfDay } from 'date-fns';
 // Sequelize options
 import { Op } from 'sequelize';
 // import * as Yup from 'yup';
@@ -12,10 +10,6 @@ import File from '../models/Files';
 import Event from '../models/Events';
 // Modelo relacional de usuários e eventos para inscrição
 import UserEvent from '../models/UserEvent';
-// Fila de ações
-import Queue from '../../lib/Queue';
-// Mail
-import Subscribe from '../../jobs/Subscribe';
 
 class ScheduleController {
     async index(req, res) {
@@ -45,17 +39,9 @@ class ScheduleController {
             include: {
                 model: Event,
                 as: 'event',
-                attributes: [
-                    'name',
-                    'description',
-                    'location',
-                    'date',
-                    'canceled_at',
-                    'successed_at',
-                ],
+                attributes: ['id', 'name', 'description', 'location', 'date'],
                 where: {
                     date: { [Op.lte]: data },
-                    [Op.or]: { successed_at: null, canceled_at: null },
                 },
                 order: [['date', 'DESC']],
                 include: [
@@ -74,93 +60,6 @@ class ScheduleController {
         });
 
         return res.json(Events);
-    }
-
-    async store(req, res) {
-        // Variaveis da url
-        const { id } = req.params;
-        // Se usuario criou o evento
-        const isUser = await Event.findOne({
-            where: {
-                id,
-                user_id: req.userId,
-            },
-        });
-        // Se o usuário criou gera erro
-        if (isUser) {
-            return res.status(401).json({
-                msg: 'Não é possível se increver em um evento que você criou.',
-            });
-        }
-        // Verifica se o evento existe
-        const isEvent = await Event.findOne({
-            where: { id, canceled_at: null },
-        });
-        // Se evento não existir gera erro
-        if (!isEvent) {
-            return res.status(401).json({
-                msg: 'Evento inexistente ou cancelado.',
-            });
-        }
-        // Se já foi inscrito
-        const Exists = await UserEvent.findOne({
-            where: {
-                user_id: req.userId,
-                event_id: id,
-            },
-        });
-        // Se já for inscrito gera erro
-        if (Exists) {
-            return res.status(401).json({
-                msg: 'Você já foi inscrito nesse evento.',
-            });
-        }
-        // Verifica disponibilidade de horário
-        const sameHour = await UserEvent.findAll({
-            where: {
-                user_id: req.userId,
-            },
-            include: [
-                {
-                    model: Event,
-                    as: 'event',
-                    attributes: ['id', 'user_id'],
-                    where: {
-                        id: { [Op.ne]: id },
-                        date: isEvent.dataValues.date,
-                    },
-                },
-            ],
-        });
-        // Se registro for encontrado
-        if (sameHour.length > 0) {
-            return res.status(401).json({
-                msg:
-                    'Você não pode se inscrever em dois eventos com mesmo horário.',
-            });
-        }
-        // Resultado da inserção
-        const response = await UserEvent.create({
-            user_id: req.userId,
-            event_id: id,
-        });
-        // Dados do usuário
-        const user = await User.findByPk(req.userId);
-
-        // Formatando data para dia dd de mês às hh:mi
-        const formattedDate = format(
-            isEvent.date,
-            "'dia' dd 'de' MMMM', às' H:mm'h'",
-            { locale: pt }
-        );
-        // Iniciando trabalho de envio de email para confirmação de cancelamento
-        await Queue.add(Subscribe.key, {
-            Exists: user,
-            formattedDate,
-            username: user.name,
-        });
-
-        return res.json(response);
     }
 }
 
