@@ -47,7 +47,8 @@ class EventController {
             location: ev.location,
             user: ev.user,
             banner: ev.banner,
-            date: format(ev.date, "'dia' dd 'de' MMMM', às' H:mm'h'", {
+            date: ev.date,
+            formattedDate: format(ev.date, "'Dia' dd 'de' MMMM', às' H:mm'h'", {
                 locale: pt,
             }),
         }));
