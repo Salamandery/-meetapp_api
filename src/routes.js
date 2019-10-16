@@ -49,5 +49,7 @@ routes.put('/users', UserController.update);
 routes.put('/events', EventsController.update);
 // Deletando o cadastro de eventos
 routes.delete('/events/:id', EventsController.delete);
+// Deletando a inscrição
+routes.delete('/subscribe/:id', SubscribeController.delete);
 
 module.exports = routes;

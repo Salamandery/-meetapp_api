@@ -1,4 +1,5 @@
-import { parseISO, endOfDay } from 'date-fns';
+import { parseISO, endOfDay, format } from 'date-fns';
+import pt from 'date-fns/locale/pt-BR';
 // Sequelize options
 import { Op } from 'sequelize';
 // import * as Yup from 'yup';
@@ -8,8 +9,6 @@ import User from '../models/Users';
 import File from '../models/Files';
 // Modelo do usuário
 import Event from '../models/Events';
-// Modelo relacional de usuários e eventos para inscrição
-import UserEvent from '../models/UserEvent';
 
 class ScheduleController {
     async index(req, res) {
@@ -28,38 +27,43 @@ class ScheduleController {
         }
         // Verificação de data
         const data = endOfDay(parseISO(date));
+
         // Listagem de eventos
-        const Events = await UserEvent.findAll({
-            attributes: ['event_id'],
+        const Events = await Event.findAll({
+            attributes: ['id', 'name', 'date', 'location', 'description'],
             where: {
-                user_id: req.userId,
+                date: { [Op.gte]: data },
             },
             limit: 10,
             offset: (page - 1) * 10,
-            include: {
-                model: Event,
-                as: 'event',
-                attributes: ['id', 'name', 'description', 'location', 'date'],
-                where: {
-                    date: { [Op.lte]: data },
+            include: [
+                {
+                    model: File,
+                    as: 'banner',
+                    attributes: ['name', 'path', 'url'],
                 },
-                order: [['date', 'DESC']],
-                include: [
-                    {
-                        model: File,
-                        as: 'banner',
-                        attributes: ['name', 'path', 'url'],
-                    },
-                    {
-                        model: User,
-                        as: 'user',
-                        attributes: ['id', 'name', 'email'],
-                    },
-                ],
-            },
+                {
+                    model: User,
+                    as: 'user',
+                    attributes: ['id', 'name', 'email'],
+                },
+            ],
         });
+        // Formatando data para dia dd de mês às hh:mi
+        const eventsFormatted = Events.map(ev => ({
+            id: ev.id,
+            name: ev.name,
+            description: ev.description,
+            location: ev.location,
+            user: ev.user,
+            banner: ev.banner,
+            date: ev.date,
+            formattedDate: format(ev.date, "'Dia' dd 'de' MMMM', às' H:mm'h'", {
+                locale: pt,
+            }),
+        }));
 
-        return res.json(Events);
+        return res.json(eventsFormatted);
     }
 }
 

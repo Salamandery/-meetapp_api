@@ -153,6 +153,30 @@ class SubscribeController {
 
         return res.json(response);
     }
+
+    async delete(req, res) {
+        // Varivaves da url
+        const { id } = req.params;
+        // Verificando se existe agendamento
+        const Exists = await Event.findByPk(id, {
+            include: [
+                { attributes: ['name', 'email'], model: User, as: 'user' },
+            ],
+        });
+        // Se não for o criador do evento gera error
+        if (!Exists) {
+            return res.status(401).json({ msg: 'Evento inexistente' });
+        }
+        // Atualizando informações
+        await UserEvent.destroy({
+            where: {
+                id,
+                user_id: req.userId,
+            },
+        });
+
+        return res.status(200).json();
+    }
 }
 
 export default new SubscribeController();
