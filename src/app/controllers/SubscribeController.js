@@ -59,8 +59,20 @@ class SubscribeController {
                 ],
             },
         });
-
-        return res.json(Events);
+        // Formatando data para dia dd de mês às hh:mi
+        const eventsFormatted = Events.map(ev => ({
+            id: ev.event.id,
+            name: ev.event.name,
+            description: ev.event.description,
+            location: ev.event.location,
+            user: ev.event.user,
+            banner: ev.event.banner,
+            date: ev.event.date,
+            formattedDate: format(ev.event.date, "dd 'de' MMMM', às' H:mm'h'", {
+                locale: pt,
+            }),
+        }));
+        return res.json(eventsFormatted);
     }
 
     async store(req, res) {
@@ -141,7 +153,7 @@ class SubscribeController {
         // Formatando data para dia dd de mês às hh:mi
         const formattedDate = format(
             event.date,
-            "'dia' dd 'de' MMMM', às' H:mm'h'",
+            "'Dia' dd 'de' MMMM', às' H:mm'h'",
             { locale: pt }
         );
         // Iniciando trabalho de envio de email para confirmação de cancelamento
@@ -158,11 +170,7 @@ class SubscribeController {
         // Varivaves da url
         const { id } = req.params;
         // Verificando se existe agendamento
-        const Exists = await Event.findByPk(id, {
-            include: [
-                { attributes: ['name', 'email'], model: User, as: 'user' },
-            ],
-        });
+        const Exists = await Event.findByPk(id);
         // Se não for o criador do evento gera error
         if (!Exists) {
             return res.status(401).json({ msg: 'Evento inexistente' });
@@ -170,7 +178,7 @@ class SubscribeController {
         // Atualizando informações
         await UserEvent.destroy({
             where: {
-                id,
+                event_id: id,
                 user_id: req.userId,
             },
         });

@@ -27,7 +27,6 @@ class ScheduleController {
         }
         // Verificação de data
         const data = endOfDay(parseISO(date));
-
         // Listagem de eventos
         const Events = await Event.findAll({
             attributes: ['id', 'name', 'date', 'location', 'description'],
